@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Film View</title>
+</head>
+<body>
+<h1>Films</h1>
+
+<div th:each="film : ${films}">
+    <p>Title: <span th:text="${film.title}"></span></p>
+    <p>Director: <span th:text="${film.director}"></span></p>
+    <p>Rating: <span th:text="${film.rating}"></span></p>
+    <hr>
+</div>
+
+</body>
+</html>
