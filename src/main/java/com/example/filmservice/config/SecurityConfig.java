@@ -12,6 +12,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -28,15 +30,17 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/h2-console/**").permitAll()  // Tillåt H2-konsolen
                         .anyRequest().authenticated()
                 )
-                .httpBasic(httpBasic -> {})
-                .formLogin(form -> form.disable()) // Inaktivera form-login om det behövs
+                .httpBasic(withDefaults())
+                .formLogin(withDefaults()) // Inaktivera form-login om det behövs
                 .exceptionHandling(ex ->
                         ex.authenticationEntryPoint((request, response, authException) -> {
                             response.sendError(401, "Unauthorized");
                         })
-                );
+                )
+                .headers().frameOptions().sameOrigin(); // Tillåt iframe från samma origin (nödvändigt för H2)
 
         return http.build();
     }
