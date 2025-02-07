@@ -1,33 +1,30 @@
 package com.example.filmservice.controller;
 
-import org.springframework.http.ResponseEntity;
+import com.example.filmservice.config.JwtUtil;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthenticationController {
-
     private final AuthenticationManager authenticationManager;
+    private final JwtUtil jwtUtil;
+    private final UserDetailsService userDetailsService;
 
-    @Autowired
-    public AuthenticationController(AuthenticationManager authenticationManager) {
+    public AuthenticationController(AuthenticationManager authenticationManager, JwtUtil jwtUtil, UserDetailsService userDetailsService) {
         this.authenticationManager = authenticationManager;
+        this.jwtUtil = jwtUtil;
+        this.userDetailsService = userDetailsService;
     }
 
-    // Inloggning endpoint
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestParam String username, @RequestParam String password) {
-        try {
-            // Försök autentisera användaren
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(username, password)
-            );
-            return ResponseEntity.ok("Login successful");
-        } catch (Exception e) {
-            return ResponseEntity.status(401).body("Invalid credentials");
-        }
+    public String login(@RequestParam String username, @RequestParam String password) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        return jwtUtil.generateToken(userDetails.getUsername());
     }
 }
