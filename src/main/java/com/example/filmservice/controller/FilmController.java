@@ -1,5 +1,6 @@
 package com.example.filmservice.controller;
 
+import com.example.filmservice.exception.CustomException;
 import com.example.filmservice.service.TmdbService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,12 @@ public class FilmController {
     @Autowired
     public FilmController(TmdbService tmdbService) {
         this.tmdbService = tmdbService;
+    }
+
+    // Test-endpoint för att generera ett anpassat fel
+    @GetMapping("/test-error")
+    public String testError() {
+        throw new CustomException("Detta är ett testfel!"); // Kastar ett anpassat undantag
     }
 
     // Hämta de mest populära filmerna
