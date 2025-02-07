@@ -35,10 +35,14 @@ dependencies {
 	runtimeOnly 'com.h2database:h2'  // Lägg till detta för att H2 ska fungera
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// Test-beroenden
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'  // För standardtest
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher' // För att köra JUnit 5 tester
+	testImplementation 'org.mockito:mockito-core'  // För mockning av objekt
+	testImplementation 'org.springframework.security:spring-security-test'  // För att testa säkerhetsfunktioner (inklusive @WithMockUser)
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+	useJUnitPlatform()  // För att använda JUnit 5
 }
