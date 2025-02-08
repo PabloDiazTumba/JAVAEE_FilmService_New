@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Home</title>
+</head>
+<body>
+
+<h1>Welcome</h1>
+
+<p th:if="${cookieUser != null}">
+    Welcome back, <span th:text="${cookieUser}"></span>!
+</p>
+
+<p th:unless="${cookieUser != null}">
+    You are not logged in.
+</p>
+
+<!-- Inloggningslänk -->
+<p><a href="/login">Login</a></p>
+
+<!-- Logga ut länk -->
+<p><a href="/logout">Logout</a></p>
+
+</body>
+</html>

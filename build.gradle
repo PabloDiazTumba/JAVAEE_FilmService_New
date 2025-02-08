@@ -24,6 +24,8 @@ repositories {
 }
 
 dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'jakarta.servlet:jakarta.servlet-api:5.0.0'
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
 	implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
@@ -35,6 +37,7 @@ dependencies {
 	runtimeOnly 'com.h2database:h2'  // Lägg till detta för att H2 ska fungera
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
+
 
 	// Test-beroenden
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'  // För standardtest

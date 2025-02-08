@@ -29,8 +29,8 @@ public class SecurityConfig {
         return http
                 .csrf(csrf -> csrf.disable()) // Inaktivera CSRF (vanligt för API:er)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/login", "/api/auth/register").permitAll() // Tillåt alla att logga in och registrera sig
-                        .anyRequest().authenticated() // Alla andra förfrågningar kräver autentisering
+                        .requestMatchers("/login", "/home", "/logout").permitAll()  // Tillåt alla att komma åt dessa sidor
+                        .anyRequest().authenticated()  // Andra sidor kräver autentisering
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Inga sessioner
                 .authenticationProvider(authenticationProvider())
