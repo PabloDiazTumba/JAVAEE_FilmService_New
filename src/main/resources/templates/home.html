@@ -8,7 +8,7 @@
 <h1>Welcome</h1>
 
 <p th:if="${cookieUser != null}">
-    Welcome back, <span th:text="${cookieUser}"></span>!
+    Welcome back<span th:text="${cookieUser}"></span>!
 </p>
 
 <p th:unless="${cookieUser != null}">

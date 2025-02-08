@@ -1,5 +1,6 @@
 package com.example.filmservice.config;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,12 +30,19 @@ public class SecurityConfig {
         return http
                 .csrf(csrf -> csrf.disable()) // Inaktivera CSRF (vanligt för API:er)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/home", "/logout").permitAll()  // Tillåt alla att komma åt dessa sidor
-                        .anyRequest().authenticated()  // Andra sidor kräver autentisering
+                        .requestMatchers("/login", "/error").permitAll()  // Tillåt åtkomst till /login och /error
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Inga sessioner
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            // Hantera autentisering fel här (t.ex. 403 Forbidden)
+                            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden");
+                        })
+                        .accessDeniedPage("/error")  // Skicka till en egen error-sida vid 403 eller andra fel
+                )
                 .build();
     }
 
