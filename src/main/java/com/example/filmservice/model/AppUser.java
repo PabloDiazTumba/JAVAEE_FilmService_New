@@ -29,4 +29,10 @@ public class AppUser {
     @NotEmpty(message = "Password cannot be empty")
     @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
+
+    // Konstruktor utan id
+    public AppUser(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
 }
