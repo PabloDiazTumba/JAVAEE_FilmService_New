@@ -1,61 +1,43 @@
-import React, { useEffect, useState } from 'react';
-import Login from './components/Login';
-import { logoutUser } from './services/authService';
-import axiosInstance from './axiosInstance';
+import React, { useState, useEffect } from "react";
+import Login from './components/Login'; // Se till att du har den här raden
+import './App.css';
 
-const App = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // Kontrollera om användaren är autentiserad vid sidladdning
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    console.log("Checking localStorage for token...");
+    const token = localStorage.getItem("token");
     if (token) {
-      setIsAuthenticated(true);
+      console.log("User is logged in.");
+      setIsLoggedIn(true);
+    } else {
+      console.log("No token found, user is not logged in.");
     }
   }, []);
 
-  // Hantera utloggning
   const handleLogout = () => {
-    logoutUser();
-    setIsAuthenticated(false);
-  };
-
-  // Om användaren är inloggad, visa en skyddad sida
-  const ProtectedPage = () => {
-    const [data, setData] = useState(null);
-
-    useEffect(() => {
-      const fetchData = async () => {
-        try {
-          const response = await axiosInstance.get('/api/protected'); // Byt till din skyddade endpoint
-          setData(response.data);
-        } catch (error) {
-          console.error(error);
-        }
-      };
-
-      fetchData();
-    }, []);
-
-    return (
-        <div>
-          <h1>Skyddad sida</h1>
-          <p>{data ? data.message : 'Laddar data...'}</p>
-          <button onClick={handleLogout}>Logga ut</button>
-        </div>
-    );
+    console.log("Logging out...");
+    localStorage.removeItem("token");
+    setIsLoggedIn(false);
   };
 
   return (
-      <div>
-        <h1>Välkommen till din app</h1>
-        {isAuthenticated ? (
-            <ProtectedPage />
+      <div className="App">
+        <h1>Welcome to the App</h1>
+        {isLoggedIn ? (
+            <div>
+              <p>Logged in!</p>
+              <button onClick={handleLogout}>Logout</button>
+            </div>
         ) : (
-            <Login onLogin={() => setIsAuthenticated(true)} />
+            <div>
+              <p>Please log in</p>
+              <Login />
+            </div>
         )}
       </div>
   );
-};
+}
 
 export default App;

@@ -1,39 +1,27 @@
-import axiosInstance from "../axiosInstance";
+import axios from "axios";
 
-// Registrering av användare
-export const registerUser = async (username, password) => {
+const API_URL = "http://localhost:8080/api/auth/";
+
+export const login = async (username, password) => {
     try {
-        const response = await axiosInstance.post('/api/auth/register', {
+        const response = await axios.post(API_URL + "login", {
             username,
             password,
         });
-        return response.data;
+
+        console.log("Login Response:", response.data);
+
+        if (response.data.token) {
+            localStorage.setItem("token", response.data.token);
+            return response.data;
+        }
     } catch (error) {
-        console.error('Registration failed:', error);
-        throw error;
+        console.error("Login failed:", error.response?.data || error.message);
     }
 };
 
-// Inloggning av användare
-export const loginUser = async (username, password) => {
-    try {
-        const response = await axiosInstance.post('/api/auth/login', null, {
-            params: {
-                username,
-                password,
-            }
-        });
-        // Spara JWT-token i localStorage
-        const token = response.data.token;
-        localStorage.setItem('token', token);
-        return response.data;
-    } catch (error) {
-        console.error('Login failed:', error);
-        throw error;
-    }
-};
-
-// Logout
-export const logoutUser = () => {
-    localStorage.removeItem('token');
+// Logout-funktion
+export const logout = () => {
+    localStorage.removeItem("token");  // Ta bort token från localStorage
+    console.log("User logged out");
 };
