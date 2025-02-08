@@ -1,10 +1,12 @@
 package com.example.filmservice.controller;
 
+import com.example.filmservice.config.JwtResponse;
 import com.example.filmservice.config.JwtUtil;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,11 +22,17 @@ public class AuthenticationController {
         this.userDetailsService = userDetailsService;
     }
 
+    // POST-method för login
     @PostMapping("/login")
-    public String login(@RequestParam String username, @RequestParam String password) {
+    public ResponseEntity<?> login(@RequestParam String username, @RequestParam String password) {
+        // Försök att autentisera användaren
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 
+        // Ladda användardetaljer och skapa JWT-token
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        return jwtUtil.generateToken(userDetails.getUsername());
+        String token = jwtUtil.generateToken(userDetails.getUsername());
+
+        // Returnera token som JSON
+        return ResponseEntity.ok(new JwtResponse(token));
     }
 }

@@ -15,6 +15,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 @Configuration
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -28,23 +30,39 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf(csrf -> csrf.disable()) // Inaktivera CSRF (vanligt för API:er)
+                .csrf(csrf -> csrf.disable())  // Disablera CSRF-skydd (om du använder stateless API)
+
+                // Ställ in tillgång till specifika sidor och API
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/error").permitAll()  // Tillåt åtkomst till /login och /error
-                        .anyRequest().authenticated()
+                        .requestMatchers("/login", "/error", "/api/auth/register").permitAll()  // Tillåt /login och /api/auth/register
+                        .requestMatchers("/api/auth/login").permitAll()  // Tillåt login via API utan autentisering
+                        .anyRequest().authenticated()  // Alla andra sidor kräver autentisering
                 )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Inga sessioner
-                .authenticationProvider(authenticationProvider())
+
+                // Form login (för vanliga användarflöden)
+                .formLogin(form -> form
+                        .loginPage("/login")  // Definiera login-sidan
+                        .loginProcessingUrl("/login")  // Definiera POST URL för login
+                        .defaultSuccessUrl("/home", true)  // Vid lyckad login, omdirigera till /home
+                        .permitAll()
+                )
+
+                // Ställ in sessionhantering för stateless API
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                // Lägg till JWT-filter för autentisering via JWT-token
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+
+                // Hantera fel och åtkomstvägran
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint((request, response, authException) -> {
-                            // Hantera autentisering fel här (t.ex. 403 Forbidden)
                             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden");
                         })
-                        .accessDeniedPage("/error")  // Skicka till en egen error-sida vid 403 eller andra fel
+                        .accessDeniedPage("/error")  // Om åtkomst nekas, omdirigera till error-sidan
                 )
                 .build();
     }
+
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
